@@ -6,11 +6,21 @@ const STORE = [
   {name: "bread", checked: false}
 ];
 
+//each item in STORE generate HTML <li> string --> 
+//item name as inner text
+//item's index as data attr
+//item's checked state (t/f) rendered as /shopping-item__checked css
+//join the items strings into one long string .join then .html
 
 function renderShoppingList() {
   // this function will be responsible for rendering the shopping list in
   // the DOM
+  //find .js-shopping-list UL item ==> insert into UL
+
   console.log('`renderShoppingList` ran');
+  const handleShoppingListItemsString = '<li>apples</li>';
+  $('.js-shopping-list').html(handleShoppingListItemsString);
+
 }
 
 
