@@ -9,6 +9,7 @@ const STORE = {
     {name: 'eggs', checked: true}
   ],
   hideCompleted : false,
+  hideNonMatches : false,
 };
 
 
@@ -38,16 +39,12 @@ function generateShoppingItemsString(shoppingList) {
   console.log('Generating shopping list element');
 
   const items = shoppingList.map((item, index) => generateItemElement(item, index));
-  console.log(items);
   return items.join('');
-
-
 }
 
 function renderShoppingList() {
   let filteredItems = [...STORE.items];
   if (STORE.hideCompleted) {
-    console.log('checked!');
     //if is true --> alter filteredItems list to only include where items = false
     // filteredItems = filteredItems.filter(item => item.checked === false)
     filteredItems = filteredItems.filter(item => !item.checked);
@@ -58,11 +55,11 @@ function renderShoppingList() {
   $('.js-shopping-list').html(handleShoppingListItemsString);
 
 }
+
 function addItemToShoppingList(itemName){
   const newItem = {name : itemName, checked: false};
   STORE.items.push(newItem);
 }
-
 
 function handleNewItemSubmit() {
   // this function will be responsible for when users add a new shopping list item
@@ -130,10 +127,25 @@ function handleToggleHideClick(){
     toggleHideFilter();
     console.log('hi');
     renderShoppingList();
-    
   });
 
   
+}
+
+function searchSTORE(searchTerm){
+  const matches = STORE.items.filter(item => item.name.includes(searchTerm));
+  let htmlMatchesStrings = generateShoppingItemsString(matches);
+  return htmlMatchesStrings;
+}
+
+function handleSearchClick(){
+  $('#search-submit').click((event) => {
+    event.preventDefault();
+    const searchTerm = $('.js-search-names-entry').val();
+    $('#js-search-names-form').val('');
+    const htmlMatchesStrings = searchSTORE(searchTerm);
+    $('.js-shopping-list').html(htmlMatchesStrings);
+  });
 }
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
@@ -145,6 +157,7 @@ function handleShoppingList() {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleHideClick();
+  handleSearchClick();
 }
 
 $(handleShoppingList());
