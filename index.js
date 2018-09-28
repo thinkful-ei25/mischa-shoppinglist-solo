@@ -20,7 +20,7 @@ const STORE = {
 //join the items strings into one long string .join then .html
 
 function generateItemElement(item, itemIndex, template){
-  return`
+  return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-iem js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
@@ -162,9 +162,8 @@ function handleSearchClick(){
     $('.js-shopping-list').html(htmlMatchesStrings);
   });
 }
-function generateItemFormElement() index){
-  return
-  `
+function generateItemFormElement(index){
+  return `
     <li class="js-item-index-element" data-item-index="${index}">
     <form id=rename-shopping-list-form-at-${index} ">
       <label for="rename-shopping-list-entry">Rename</label>
