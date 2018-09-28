@@ -19,7 +19,7 @@ const STORE = {
 //item's checked state (t/f) rendered as /shopping-item__checked css
 //join the items strings into one long string .join then .html
 
-function generateItemElement(item, itemIndex, template){
+function generateItemElement(item, itemIndex){
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-iem js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
@@ -41,19 +41,19 @@ function generateItemElement(item, itemIndex, template){
 function generateShoppingItemsString(shoppingList) {
   console.log('Generating shopping list element');
   if (STORE.editing){
-    const items = shoppingList.map((item, index) => {
-      if (item.name === '') {
-        generateItemFormElement(item, index);
-      }else{
-        generateItemElement(item, index);
+    const items = shoppingList.map(function (item,index){
+      if (item.name === ''){
+        return generateItemFormElement(index);
+      }else {
+        return generateItemElement(item, index);
       }
-    }); 
-    console.log(items);
-    return items.join('');
-  }else{
-    const items = shoppingList.map((item, index) => generateItemElement(item, index));
+    });
     return items.join('');
   }
+  // else {
+  //   const items = shoppingList.map((item, index) => generateItemElement(item, index));
+  //   return items.join('');
+  // }
 }
 
 function renderShoppingList() {
@@ -67,6 +67,7 @@ function renderShoppingList() {
 
   // console.log('`renderShoppingList` ran');
   const handleShoppingListItemsString = generateShoppingItemsString(filteredItems);
+  console.log(STORE.editing);
   //insert html into DOM
   $('.js-shopping-list').html(handleShoppingListItemsString);
 
@@ -123,7 +124,6 @@ function handleDeleteItemClicked() {
   // $('.js-shopping-list').on('click','.js-item-delete', event => {
   $('.js-shopping-list').on('click', '.js-item-delete', (event)=>{
     const itemIndex = getItemIndexFromElement(event.target);
-    console.log(itemIndex);
     deleteItem(itemIndex);
     renderShoppingList();
   });
@@ -165,7 +165,7 @@ function handleSearchClick(){
 function generateItemFormElement(index){
   return `
     <li class="js-item-index-element" data-item-index="${index}">
-    <form id=rename-shopping-list-form-at-${index} ">
+    <form id=rename-shopping-list-form-at-${index} class="rename-shopping-list-form">
       <label for="rename-shopping-list-entry">Rename</label>
       <input type="text" name="rename-shopping-list-entry" class="js-rename-form placeholder="e.g., broccoli">
       <button type="submit">Add item</button>
@@ -193,30 +193,44 @@ function generateItemFormElement(index){
 // after submit --> update STORE name 
 // editing is off
 // recall renderpage 
-function editing(){
+function toggleEditing(){
   STORE.editing = !STORE.editing;
 }
 
+
+function updateName(index, itemName){
+  STORE.items[index].name = itemName;
+}
+function handleRenameFormSubmit(){
+  $('.rename-shopping-list-form').submit((event) => {
+    console.log(event.target);
+    event.preventDefault();
+    const renamedItem = $('.js-rename-form').val();
+    $('.js-shopping-list-entry').val('');
+    const index = getItemIndexFromElement(event.target);
+    updateName(index, renamedItem);
+    toggleEditing();
+    renderShoppingList();
+  });
+}
 function removeNameAtIndex(itemIndex){
   STORE.items[itemIndex].name = '';
 }
+
 function handleEditClick(){
   //get form html
-  //replace name span with form
+  //replace name span with for
   //on submit 
   // get the value 
   // replace name with the value
-  $('.js-item-edit').click((event) =>{
-    editing();
+  $('.js-shopping-list').on('click','.js-item-edit',(event) =>{
+    toggleEditing();
     const itemIndex = getItemIndexFromElement(event.target);
     removeNameAtIndex(itemIndex);
-    console.log(STORE.items[itemIndex]);
     renderShoppingList();
-    // const htmlForm = generateForm(itemIndex);
-
-
-  
+    handleRenameFormSubmit();
   });
+  console.log('done!');
 }
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
@@ -229,6 +243,7 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleToggleHideClick();
   handleEditClick();
+  // handleRenameFormSubmit();
   handleSearchClick();
 }
 
