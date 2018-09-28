@@ -20,7 +20,7 @@ const STORE = {
 //join the items strings into one long string .join then .html
 
 function generateItemElement(item, itemIndex, template){
-  return`
+  return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-iem js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
