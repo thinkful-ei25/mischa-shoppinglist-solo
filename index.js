@@ -1,4 +1,8 @@
 'use strict';
+const store = [
+
+];
+
 function renderShoppingList() {
   // this function will be responsible for rendering the shopping list in
   // the DOM
@@ -22,7 +26,7 @@ function handleItemCheckClicked() {
 function handleDeleteItemClicked() {
   // this function will be responsible for when users want to delete a shopping list
   // item
-  console.log('`handleDeleteItemClicked` ran')
+  console.log('`handleDeleteItemClicked` ran');
 }
 
 // this function will be our callback when the page loads. it's responsible for
@@ -30,5 +34,10 @@ function handleDeleteItemClicked() {
 // that handle new item submission and user clicks on the "check" and "delete" buttons
 // for individual shopping list items.
 function handleShoppingList() {
-
+  renderShoppingList();
+  handleNewItemSubmit();
+  handleItemCheckClicked();
+  handleDeleteItemClicked();
 }
+
+$(handleShoppingList());
