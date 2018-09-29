@@ -40,20 +40,20 @@ function generateItemElement(item, itemIndex){
 
 function generateShoppingItemsString(shoppingList) {
   console.log('Generating shopping list element');
-  if (STORE.editing){
+  if(STORE.editing){
     const items = shoppingList.map(function (item,index){
       if (item.name === ''){
         return generateItemFormElement(index);
       }else {
         return generateItemElement(item, index);
       }
+      
     });
     return items.join('');
+  } else {
+    const items = shoppingList.map((item, index) => generateItemElement(item, index));
+    return items.join('');
   }
-  // else {
-  //   const items = shoppingList.map((item, index) => generateItemElement(item, index));
-  //   return items.join('');
-  // }
 }
 
 function renderShoppingList() {
@@ -184,30 +184,19 @@ function generateItemFormElement(index){
   </li>
   `;
 }
-
-//if editing is true then we want to --get the element index
-//remove name from STORE at item[index]
-//a funciton inside of render that says 
-//  if editing THEN find STORE item with name = empty AND render that item with generate form
-//  otherwise generate regular
-// after submit --> update STORE name 
-// editing is off
-// recall renderpage 
 function toggleEditing(){
   STORE.editing = !STORE.editing;
 }
-
-
 function updateName(index, itemName){
   STORE.items[index].name = itemName;
 }
 function handleRenameFormSubmit(){
-  $('.rename-shopping-list-form').submit((event) => {
-    console.log(event.target);
+  $('.js-shopping-list').on('submit','.rename-shopping-list-form',(event) => {
     event.preventDefault();
     const renamedItem = $('.js-rename-form').val();
     $('.js-shopping-list-entry').val('');
     const index = getItemIndexFromElement(event.target);
+    console.log(renamedItem);
     updateName(index, renamedItem);
     toggleEditing();
     renderShoppingList();
@@ -216,7 +205,6 @@ function handleRenameFormSubmit(){
 function removeNameAtIndex(itemIndex){
   STORE.items[itemIndex].name = '';
 }
-
 function handleEditClick(){
   //get form html
   //replace name span with for
@@ -224,11 +212,14 @@ function handleEditClick(){
   // get the value 
   // replace name with the value
   $('.js-shopping-list').on('click','.js-item-edit',(event) =>{
+    if (STORE.editing) return;
+    // console.log('test');
+    // console.log(STORE.toggleEditing);
     toggleEditing();
     const itemIndex = getItemIndexFromElement(event.target);
     removeNameAtIndex(itemIndex);
     renderShoppingList();
-    handleRenameFormSubmit();
+    // handleRenameFormSubmit();
   });
   console.log('done!');
 }
@@ -243,7 +234,7 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleToggleHideClick();
   handleEditClick();
-  // handleRenameFormSubmit();
+  handleRenameFormSubmit();
   handleSearchClick();
 }
 
