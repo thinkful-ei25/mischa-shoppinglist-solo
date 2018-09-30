@@ -9,7 +9,6 @@ const STORE = {
     {name: 'eggs', checked: true}
   ],
   hideCompleted : false,
-  editing : false,
 };
 
 
@@ -40,21 +39,14 @@ function generateItemElement(item, itemIndex){
 }
 
 function generateShoppingItemsString(shoppingList) {
-  console.log('Generating shopping list element');
-  if(STORE.editing){
-    const items = shoppingList.map(function (item,index){
-      if (item.name === ''){
-        return generateItemFormElement(index);
-      }else {
-        return generateItemElement(item, index);
-      }
-      
-    });
-    return items.join('');
-  } else {
-    const items = shoppingList.map((item, index) => generateItemElement(item, index));
-    return items.join('');
-  }
+  const items = shoppingList.map(function (item,index){
+    if (item.name === ''){
+      return generateItemFormElement(index);
+    }else {
+      return generateItemElement(item, index);
+    }
+  });
+  return items.join('');
 }
 
 function renderShoppingList() {
@@ -64,11 +56,11 @@ function renderShoppingList() {
     // filteredItems = filteredItems.filter(item => item.checked === false)
     filteredItems = filteredItems.filter(item => !item.checked);
   }
-  //if editing then find nameless entry and mgenerate form else geneterateShoppingItemsString
+  //if editing then find nameless entry and generate form else geneterateShoppingItemsString
 
   // console.log('`renderShoppingList` ran');
   const handleShoppingListItemsString = generateShoppingItemsString(filteredItems);
-  console.log(STORE.editing);
+  // console.log(STORE.editing);
   //insert html into DOM
   $('.js-shopping-list').html(handleShoppingListItemsString);
 
@@ -120,7 +112,6 @@ function deleteItem(itemIndex){
 
 function handleDeleteItemClicked() {
   // this function will be responsible for when users want to delete a shopping list
-  // item
   // const index = getItemIndexFromElement(event.target);
   // $('.js-shopping-list').on('click','.js-item-delete', event => {
   $('.js-shopping-list').on('click', '.js-item-delete', (event)=>{
@@ -129,26 +120,23 @@ function handleDeleteItemClicked() {
     renderShoppingList();
   });
 
-  console.log('`handleDeleteItemClicked` ran');
+  // console.log('`handleDeleteItemClicked` ran');
 }
 
 function toggleHideFilter(){
   STORE.hideCompleted = !STORE.hideCompleted;
-  console.log(STORE.hideCompleted);
+  // console.log(STORE.hideCompleted);
   return;
 }
 
 function handleToggleHideClick(){
   $('#toggle-completed-filter').click(( ) => {
     toggleHideFilter();
-    console.log('hi');
     renderShoppingList();
   });
-
-  
 }
 
-function searchSTORE(searchTerm){
+function searchDatabaseForNameMatches(searchTerm){
   const matches = STORE.items.filter(item => item.name.includes(searchTerm));
   let htmlMatchesStrings = generateShoppingItemsString(matches);
   return htmlMatchesStrings;
@@ -159,7 +147,7 @@ function handleSearchClick(){
     event.preventDefault();
     const searchTerm = $('.js-search-names-entry').val();
     $('#js-search-names-form').val('');
-    const htmlMatchesStrings = searchSTORE(searchTerm);
+    const htmlMatchesStrings = searchDatabaseForNameMatches(searchTerm);
     $('.js-shopping-list').html(htmlMatchesStrings);
   });
 }
@@ -168,7 +156,7 @@ function generateItemFormElement(index){
     <li class="js-item-index-element" data-item-index="${index}">
     <form id=rename-shopping-list-form-at-${index} class="rename-shopping-list-form">
       <label for="rename-shopping-list-entry">Rename</label>
-      <input type="text" name="rename-shopping-list-entry" class="js-rename-form placeholder="e.g., broccoli">
+      <input type="text" name="rename-shopping-list-entry" class="js-rename-form" placeholder="e.g., broccoli">
       <button type="submit">Add item</button>
     </form> 
     <div class="shopping-item-controls">
@@ -185,27 +173,29 @@ function generateItemFormElement(index){
   </li>
   `;
 }
-function toggleEditing(){
-  STORE.editing = !STORE.editing;
-}
+
 function updateName(index, itemName){
   STORE.items[index].name = itemName;
 }
+function nameIsEmpty(itemIndex){
+  return !STORE.items[itemIndex].name ?  true : false;
+}
+
 function handleRenameFormSubmit(){
   $('.js-shopping-list').on('submit','.rename-shopping-list-form',(event) => {
     event.preventDefault();
-    const renamedItem = $('.js-rename-form').val();
-    $('.js-shopping-list-entry').val('');
     const index = getItemIndexFromElement(event.target);
-    console.log(renamedItem);
-    updateName(index, renamedItem);
-    toggleEditing();
+    const newName = $(`#rename-shopping-list-form-at-${index} > input`).val();
+    if(!newName) return;
+    updateName(index, newName);
     renderShoppingList();
   });
 }
 function removeNameAtIndex(itemIndex){
-  STORE.items[itemIndex].name = '';
+  if (STORE.items[itemIndex].name === '') return false;
+  else STORE.items[itemIndex].name = '';
 }
+
 function handleEditClick(){
   //get form html
   //replace name span with for
@@ -213,16 +203,12 @@ function handleEditClick(){
   // get the value 
   // replace name with the value
   $('.js-shopping-list').on('click','.js-item-edit',(event) =>{
-    if (STORE.editing) return;
-    // console.log('test');
-    // console.log(STORE.toggleEditing);
-    toggleEditing();
     const itemIndex = getItemIndexFromElement(event.target);
+    if(nameIsEmpty(itemIndex)) return;
     removeNameAtIndex(itemIndex);
     renderShoppingList();
-    // handleRenameFormSubmit();
   });
-  console.log('done!');
+  // console.log('done!');
 }
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
